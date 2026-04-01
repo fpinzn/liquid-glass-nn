@@ -3,10 +3,10 @@ set -e
 
 echo "=== Liquid Glass NN — Train ==="
 
-# Activate venv
+# Auto-setup if needed
 if [ ! -d "venv" ]; then
-    echo "Run ./setup.sh first"
-    exit 1
+    echo "--- First run: setting up environment ---"
+    ./setup.sh
 fi
 source venv/bin/activate
 
