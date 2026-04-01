@@ -40,8 +40,20 @@ python -m src.train \
     --lr 1e-3 \
     --output-dir runs
 
+# Step 3: Generate HTML report
+echo ""
+echo "--- Generating comparison report ---"
+python -m src.report --runs-dir runs --frames-dir data/frames --output-dir results --n-samples 8
+
+# Step 4: Commit and push results
+echo ""
+echo "--- Committing results ---"
+git add results/report.html runs/comparison.json runs/*/meta.json
+git commit -m "results: training report — $(date '+%Y-%m-%d %H:%M')" || true
+git push origin main || echo "Push failed — run 'git push origin main' manually"
+
 echo ""
 echo "=== Training complete ==="
-echo "Results: runs/comparison.json"
+echo "Report: results/report.html"
 echo "Checkpoints: runs/<arch>/best.pt"
 echo "Tensorboard: tensorboard --logdir runs/"

@@ -3,6 +3,8 @@ __pycache__/
 *.pyc
 data/frames/
 data/video/
-runs/
+runs/*/best.pt
+runs/*/final.pt
+runs/*/events.*
 *.egg-info/
 .DS_Store
