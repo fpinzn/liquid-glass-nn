@@ -1,0 +1,22 @@
+name: LiquidGlassCapture
+options:
+  bundleIdPrefix: com.liquidglass
+  deploymentTarget:
+    iOS: "26.0"
+  xcodeVersion: "16.0"
+
+targets:
+  LiquidGlassCapture:
+    type: application
+    platform: iOS
+    sources:
+      - LiquidGlassCapture
+    settings:
+      base:
+        INFOPLIST_FILE: LiquidGlassCapture/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.liquidglass.capture
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        DEVELOPMENT_TEAM: ""
