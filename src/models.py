@@ -122,6 +122,67 @@ class DeepNarrowNet(nn.Module):
         return x + self.net(x)
 
 
+class UNet(nn.Module):
+    """U-Net encoder-decoder with skip connections. ~8M params.
+
+    Full receptive field via downsampling — can capture long-range
+    displacement effects. Not for mobile, but establishes the quality ceiling.
+    """
+
+    def __init__(self, base_ch=64):
+        super().__init__()
+        # Encoder
+        self.enc1 = self._double_conv(3, base_ch)
+        self.enc2 = self._double_conv(base_ch, base_ch * 2)
+        self.enc3 = self._double_conv(base_ch * 2, base_ch * 4)
+        self.enc4 = self._double_conv(base_ch * 4, base_ch * 8)
+
+        # Bottleneck
+        self.bottleneck = self._double_conv(base_ch * 8, base_ch * 16)
+
+        # Decoder
+        self.up4 = nn.ConvTranspose2d(base_ch * 16, base_ch * 8, 2, stride=2)
+        self.dec4 = self._double_conv(base_ch * 16, base_ch * 8)
+        self.up3 = nn.ConvTranspose2d(base_ch * 8, base_ch * 4, 2, stride=2)
+        self.dec3 = self._double_conv(base_ch * 8, base_ch * 4)
+        self.up2 = nn.ConvTranspose2d(base_ch * 4, base_ch * 2, 2, stride=2)
+        self.dec2 = self._double_conv(base_ch * 4, base_ch * 2)
+        self.up1 = nn.ConvTranspose2d(base_ch * 2, base_ch, 2, stride=2)
+        self.dec1 = self._double_conv(base_ch * 2, base_ch)
+
+        self.final = nn.Conv2d(base_ch, 3, 1)
+        self.pool = nn.MaxPool2d(2)
+
+    @staticmethod
+    def _double_conv(in_ch, out_ch):
+        return nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        # Encoder
+        e1 = self.enc1(x)
+        e2 = self.enc2(self.pool(e1))
+        e3 = self.enc3(self.pool(e2))
+        e4 = self.enc4(self.pool(e3))
+
+        # Bottleneck
+        b = self.bottleneck(self.pool(e4))
+
+        # Decoder with skip connections
+        d4 = self.dec4(torch.cat([self.up4(b), e4], dim=1))
+        d3 = self.dec3(torch.cat([self.up3(d4), e3], dim=1))
+        d2 = self.dec2(torch.cat([self.up2(d3), e2], dim=1))
+        d1 = self.dec1(torch.cat([self.up1(d2), e1], dim=1))
+
+        return x + self.final(d1)
+
+
 # Registry for easy access
 MODELS = {
     "micro": MicroNet,
@@ -130,6 +191,7 @@ MODELS = {
     "wide_shallow": WideShallowNet,
     "bottleneck": BottleneckNet,
     "deep_narrow": DeepNarrowNet,
+    "unet": UNet,
 }
 
 
