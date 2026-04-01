@@ -10,16 +10,17 @@ if [ ! -d "venv" ]; then
 fi
 source venv/bin/activate
 
-# Step 1: Extract frames from video
+# Step 1: Get training frames
 if [ ! -d "data/frames" ] || [ -z "$(ls data/frames/ 2>/dev/null)" ]; then
-    if [ -z "$(ls data/video/ 2>/dev/null)" ]; then
-        echo "ERROR: No videos found in data/video/"
-        echo "Drop your video file(s) there and re-run."
-        exit 1
+    if [ -n "$(ls data/video/ 2>/dev/null)" ]; then
+        echo ""
+        echo "--- Extracting frames from video ---"
+        python -m src.extract_frames --video data/video/ --output-dir data/frames --size 256
+    else
+        echo ""
+        echo "--- No video found, generating synthetic frames ---"
+        python -m src.generate_frames --output-dir data/frames --n-frames 5000 --size 256
     fi
-    echo ""
-    echo "--- Extracting frames from video ---"
-    python -m src.extract_frames --video data/video/ --output-dir data/frames --size 256
 else
     echo "Frames already extracted ($(ls data/frames/*.png 2>/dev/null | wc -l) frames)"
 fi
