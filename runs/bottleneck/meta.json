@@ -1,0 +1,12 @@
+{
+  "arch": "bottleneck",
+  "params": 19395,
+  "flops": 2529165312,
+  "best_val_loss": 0.003486773945391178,
+  "best_epoch": 192,
+  "epochs": 200,
+  "batch_size": 16,
+  "lr": 0.001,
+  "dataset_mode": "synthetic",
+  "dataset_size": 5000
+}

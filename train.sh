@@ -8,18 +8,25 @@ if [ ! -d "venv" ]; then
     echo "--- First run: setting up environment ---"
     ./setup.sh
 fi
-source venv/bin/activate
+source venv/bin/activate 2>/dev/null || source venv/Scripts/activate
+
+# Resolve venv python
+if [ -f "venv/Scripts/python.exe" ]; then
+    PYTHON=venv/Scripts/python.exe
+else
+    PYTHON=venv/bin/python
+fi
 
 # Step 1: Get training frames
 if [ ! -d "data/frames" ] || [ -z "$(ls data/frames/ 2>/dev/null)" ]; then
     if [ -n "$(ls data/video/ 2>/dev/null)" ]; then
         echo ""
         echo "--- Extracting frames from video ---"
-        python -m src.extract_frames --video data/video/ --output-dir data/frames --size 256
+        $PYTHON -m src.extract_frames --video data/video/ --output-dir data/frames --size 256
     else
         echo ""
         echo "--- No video found, generating synthetic frames ---"
-        python -m src.generate_frames --output-dir data/frames --n-frames 5000 --size 256
+        $PYTHON -m src.generate_frames --output-dir data/frames --n-frames 5000 --size 256
     fi
 else
     echo "Frames already extracted ($(ls data/frames/*.png 2>/dev/null | wc -l) frames)"
@@ -31,7 +38,7 @@ echo "--- Training all architectures ---"
 echo "Tensorboard: tensorboard --logdir runs/"
 echo ""
 
-python -m src.train \
+$PYTHON -m src.train \
     --arch all \
     --frames-dir data/frames \
     --dataset-mode synthetic \
@@ -43,7 +50,7 @@ python -m src.train \
 # Step 3: Generate HTML report
 echo ""
 echo "--- Generating comparison report ---"
-python -m src.report --runs-dir runs --frames-dir data/frames --output-dir results --n-samples 8
+$PYTHON -m src.report --runs-dir runs --frames-dir data/frames --output-dir results --n-samples 8
 
 # Step 4: Commit and push results
 echo ""

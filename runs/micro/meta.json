@@ -1,0 +1,12 @@
+{
+  "arch": "micro",
+  "params": 1027,
+  "flops": 132120576,
+  "best_val_loss": 0.005174739077687263,
+  "best_epoch": 176,
+  "epochs": 200,
+  "batch_size": 16,
+  "lr": 0.001,
+  "dataset_mode": "synthetic",
+  "dataset_size": 5000
+}

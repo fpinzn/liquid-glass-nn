@@ -1,0 +1,12 @@
+{
+  "arch": "small",
+  "params": 48003,
+  "flops": 6266290176,
+  "best_val_loss": 0.002687639832496643,
+  "best_epoch": 193,
+  "epochs": 200,
+  "batch_size": 16,
+  "lr": 0.001,
+  "dataset_mode": "synthetic",
+  "dataset_size": 5000
+}
